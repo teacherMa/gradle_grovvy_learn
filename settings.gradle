@@ -1,0 +1,3 @@
+include ':lib_novel'
+include ':app'
+rootProject.name = "PackageDebug"

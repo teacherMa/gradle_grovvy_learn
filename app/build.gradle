@@ -1,0 +1,132 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.0"
+
+    defaultConfig {
+        applicationId "com.bytedance.packagedebug"
+        minSdkVersion 16
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        release {
+            storeFile file('/Users/bytedance/work/Android/PackageDebug/Untitled')
+            storePassword 'android'
+            keyAlias 'key0'
+            keyPassword 'android'
+        }
+        debug {
+            storeFile file('/Users/bytedance/work/Android/PackageDebug/Untitled')
+            storePassword 'android'
+            keyAlias 'key0'
+            keyPassword 'android'
+        }
+    }
+
+    buildTypes {
+        debug {
+            println 'debug build type'
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
+//            applicationIdSuffix ".debug"
+        }
+        release {
+            println 'release build type'
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+//            applicationIdSuffix '.release'
+        }
+
+        /**
+         * The `initWith` property allows you to copy configurations from other build types,
+         * then configure only the settings you want to change. This one copies the debug build
+         * type, and then changes the manifest placeholder and application ID.
+         */
+        staging {
+            println 'staging build type'
+            initWith debug
+//            applicationIdSuffix ".staging"
+        }
+    }
+
+    /**
+     * You can't declare multiple flavor dimension by this way:
+     *
+     * flavorDimensions 'function'
+     * ... ...
+     * flavorDimensions 'country'
+     *
+     * In this situation, only the last flavor dimension will be recognized.
+     *
+     * You should declare like that:
+     *
+     * flavorDimensions 'flavor1', 'flavor2', ...
+     */
+    flavorDimensions 'function', 'country'
+    productFlavors {
+//        basic {
+//            println 'basic product'
+//            dimension 'function'
+//            applicationIdSuffix '.basic'
+//        }
+//        ultra {
+//            println 'ultra product'
+//            dimension 'function'
+//            applicationIdSuffix '.ultra'
+//        }
+//        china {
+//            println 'china product'
+//            dimension 'country'
+//            applicationIdSuffix '.china'
+//        }
+//        us {
+//            println 'us product'
+//            dimension 'country'
+//            applicationIdSuffix '.us'
+//        }
+    }
+
+    sourceSets {
+        debug {
+            /**
+             * For directories, you can use xxx = ['path1','path2','',...] to specify or use xxx += 'path1' to modify.
+             */
+            java.srcDirs += 'src/staging'
+            manifest.srcFile 'main/AndroidManifest.xml'
+        }
+    }
+
+    /**
+     * Filter the products you don't care.
+     */
+    variantFilter { variant ->
+        def names = variant.flavors*.name
+        if (rootProject.ext.ignoreUsProduct) {
+            if (names.contains("us") || names.contains("staging")) {
+                setIgnore(true)
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'androidx.core:core-ktx:1.3.0'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+}
